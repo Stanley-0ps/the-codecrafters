@@ -101,12 +101,37 @@ string-transformer/
 
 ---
 
+## 🎯 Future Improvements
+
+✦ **History Command** – Show the last 5 transformations the user ran, including:
+
+* Command used
+* Input text
+* Output result
+
+✦ **Count Command (`count <text>`)** – Display detailed text statistics:
+
+* Total characters
+* Total letters only
+* Total words
+* Total spaces
+
+✦ **Palindrome Command (`palindrome <text>`)** – Check if the input reads the same forwards and backwards (ignoring spaces and casing).
+
+**Examples:**
+
+```bash
+> palindrome never odd or even
+✦ "never odd or even" is a palindrome!
+
+> palindrome sentinel
+✗ "sentinel" is not a palindrome.
+```
+
+---
+
 ## 📄 License
 
 This project is open-source and free to use.
 
 ---
-
-If you want, I can also make a **slightly more “GitHub-ready” version** with **emojis, badges, and a table of commands** so it looks more professional and visual at a glance.
-
-Do you want me to do that?
