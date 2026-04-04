@@ -13,11 +13,19 @@ import (
 	"unicode"
 )
 
+type HistoryEntry struct {
+	Command string
+	Input   string
+	Output  string
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("STRING TRANSFORMER")
-	fmt.Println("Command list: upper, lower, title, cap, snake, reverse")
-	fmt.Println("Type 'exit' to shut down program")
+	fmt.Println("Command list: upper, lower, title, cap, snake, reverse, count")
+	fmt.Println("Type 'exit' to shut down program or 'history' for last 5 transformations")
+
+	var history []HistoryEntry
 
 	for {
 		fmt.Print("> ")
@@ -28,34 +36,70 @@ func main() {
 			// User pressed Enter with no text: show prompt again
 			continue
 		}
-
 		if strings.ToLower(input) == "exit" {
 			fmt.Println("Shutting down String Transformer. Goodbye!")
 			break
 		}
 
 		parts := strings.SplitN(input, " ", 2)
+		command := strings.ToLower(parts[0])
+
+		if command == "history" {
+			if len(history) == 0 {
+				fmt.Println("No history yet.")
+				continue
+			}
+
+			fmt.Println("Last transformations:")
+			for i, h := range history {
+				fmt.Printf("%d) [%s]\n   Input: %s\n   Output: %s\n",
+					i+1, h.Command, h.Input, h.Output)
+			}
+			continue
+		}
+
 		if len(parts) != 2 {
 			fmt.Println("✗ No text provided. Example Usage: upper <text>")
 			continue
 		}
 
-		command := strings.ToLower(parts[0])
 		text := parts[1]
+
+		command = strings.ToLower(parts[0])
+		text = parts[1]
 
 		validCommands := map[string]bool{
 			"upper": true, "lower": true, "cap": true,
 			"title": true, "snake": true, "reverse": true,
+			"history": true, "count": true,
 		}
 
 		if !validCommands[command] {
 			fmt.Printf("✗ Unknown command: \"%s\"\n", command)
-			fmt.Println("Valid commands: upper, lower, cap, title, snake, reverse, exit")
+			fmt.Println("Valid commands: upper, lower, cap, title, snake, reverse, exit, count")
+			continue
+		}
+		if command == "count" {
+			CountText(text)
 			continue
 		}
 
 		result := TransformString(text, command)
 		fmt.Println("result:", result)
+
+		// Save to history
+		entry := HistoryEntry{
+			Command: command,
+			Input:   text,
+			Output:  result,
+		}
+
+		history = append(history, entry)
+
+		// Keep only last 5
+		if len(history) > 5 {
+			history = history[len(history)-5:]
+		}
 	}
 }
 
@@ -109,6 +153,28 @@ func Snake(text string) string {
 		}
 	}
 	return b.String()
+}
+
+func CountText(text string) {
+	totalChars := len([]rune(text)) // supports Unicode
+	letters := 0
+	spaces := 0
+
+	for _, r := range text {
+		if unicode.IsLetter(r) {
+			letters++
+		}
+		if unicode.IsSpace(r) {
+			spaces++
+		}
+	}
+
+	words := len(strings.Fields(text))
+
+	fmt.Println("Total characters:", totalChars)
+	fmt.Println("Total letters:", letters)
+	fmt.Println("Total words:", words)
+	fmt.Println("Total spaces:", spaces)
 }
 
 func TransformString(text, mode string) string {
