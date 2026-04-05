@@ -22,18 +22,22 @@ type HistoryEntry struct {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("STRING TRANSFORMER")
-	fmt.Println("Command list: upper, lower, title, cap, snake, reverse, count")
+	fmt.Println("Command list: upper, lower, title, cap, snake, reverse, count, palindrome")
 	fmt.Println("Type 'exit' to shut down program or 'history' for last 5 transformations")
 
 	var history []HistoryEntry
+	validCommands := map[string]bool{
+		"upper": true, "lower": true, "cap": true,
+		"title": true, "snake": true, "reverse": true,
+		"history": true, "count": true, "palindrome": true,
+	}
 
 	for {
 		fmt.Print("> ")
 		scanner.Scan()
-		input := strings.TrimSpace(scanner.Text()) // Trim whitespace
+		input := strings.TrimSpace(scanner.Text())
 
 		if input == "" {
-			// User pressed Enter with no text: show prompt again
 			continue
 		}
 		if strings.ToLower(input) == "exit" {
@@ -49,7 +53,6 @@ func main() {
 				fmt.Println("No history yet.")
 				continue
 			}
-
 			fmt.Println("Last transformations:")
 			for i, h := range history {
 				fmt.Printf("%d) [%s]\n   Input: %s\n   Output: %s\n",
@@ -65,45 +68,46 @@ func main() {
 
 		text := parts[1]
 
-		command = strings.ToLower(parts[0])
-		text = parts[1]
-
-		validCommands := map[string]bool{
-			"upper": true, "lower": true, "cap": true,
-			"title": true, "snake": true, "reverse": true,
-			"history": true, "count": true,
-		}
-
 		if !validCommands[command] {
 			fmt.Printf("✗ Unknown command: \"%s\"\n", command)
-			fmt.Println("Valid commands: upper, lower, cap, title, snake, reverse, exit, count")
+			fmt.Println("Valid commands: upper, lower, cap, title, snake, reverse, palindrome, exit, count")
 			continue
 		}
-		if command == "count" {
+
+		var result string
+
+		switch command {
+		case "palindrome":
+			if IsPalindrome(text) {
+				result = "is a palindrome!"
+				fmt.Printf("✦ \"%s\" %s\n", text, result)
+			} else {
+				result = "is not a palindrome."
+				fmt.Printf("✗ \"%s\" %s\n", text, result)
+			}
+		case "count":
 			CountText(text)
 			continue
+		default:
+			result = TransformString(text, command)
+			fmt.Println("result:", result)
 		}
 
-		result := TransformString(text, command)
-		fmt.Println("result:", result)
-
 		// Save to history
-		entry := HistoryEntry{
+		history = append(history, HistoryEntry{
 			Command: command,
 			Input:   text,
 			Output:  result,
-		}
+		})
 
-		history = append(history, entry)
-
-		// Keep only last 5
+		// Keep only last 5 entries
 		if len(history) > 5 {
 			history = history[len(history)-5:]
 		}
 	}
 }
 
-// Transformations
+// --- Transformations ---
 func Title(text string) string {
 	if len(text) == 0 {
 		return text
@@ -130,16 +134,12 @@ func Title(text string) string {
 	return strings.Join(words, " ")
 }
 
-func reverse(s string) string {
-	words := strings.Fields(s)
-	for i, word := range words {
-		runes := []rune(word)
-		for l, r := 0, len(runes)-1; l < r; l, r = l+1, r-1 {
-			runes[l], runes[r] = runes[r], runes[l]
-		}
-		words[i] = string(runes)
+func reverseText(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
 	}
-	return strings.Join(words, " ")
+	return string(runes)
 }
 
 func Snake(text string) string {
@@ -156,7 +156,7 @@ func Snake(text string) string {
 }
 
 func CountText(text string) {
-	totalChars := len([]rune(text)) // supports Unicode
+	totalChars := len([]rune(text))
 	letters := 0
 	spaces := 0
 
@@ -186,7 +186,7 @@ func TransformString(text, mode string) string {
 	case "title":
 		return Title(text)
 	case "reverse":
-		return reverse(text)
+		return reverseText(text)
 	case "snake":
 		return Snake(text)
 	case "cap":
@@ -200,4 +200,21 @@ func TransformString(text, mode string) string {
 	default:
 		return text
 	}
+}
+
+// --- Palindrome ---
+func IsPalindrome(text string) bool {
+	var cleaned []rune
+	for _, r := range text {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			cleaned = append(cleaned, unicode.ToLower(r))
+		}
+	}
+
+	for i, j := 0, len(cleaned)-1; i < j; i, j = i+1, j-1 {
+		if cleaned[i] != cleaned[j] {
+			return false
+		}
+	}
+	return true
 }
