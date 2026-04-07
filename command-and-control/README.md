@@ -1,7 +1,3 @@
-Perfect! I can rewrite your README in that **concise, emoji-rich style** for the full SENTINEL Command & Control Console project:
-
----
-
 # 🛰️ SENTINEL — Command & Control Console (Go)
 
 A unified command-line console built with Go, combining a **calculator**, **base converter**, and **string transformer**. Perform calculations, convert numbers, and transform text all from **one interactive CLI**.
