@@ -98,14 +98,15 @@ C&C> exit
 ## 🧠 Project Structure
 
 ```text
-sentinel-cc/
-├── main.go        # Entry point and unified CLI logic
-├── calculator.go  # Arithmetic operations & validation
-├── base-converter.go        # Base conversion logic (dec, bin, hex)
-├── helpers.go      # String transformations & history
-├── pipe.go      # String transformations & history
-├── help.go      #
-├── README.md      # Project documentation
+command-and-control/
+├── main.go                  # Entry point & console loop (C&C prompt)
+├── calculator.go           # Calculator module (add, sub, mul, div, mod, pow)
+├── base-converter.go       # Base conversion logic (dec, bin, hex)
+├── string-transformer.go   # String operations (upper, lower, snake, etc.)
+├── pipe.go                 # Pipe system (command chaining with |)
+├── helpers.go              # Shared utilities (parsing, formatting, last result)
+├── help.go                 # Help menu and command descriptions
+├── README.md               # Project documentation
 ```
 
 ---
